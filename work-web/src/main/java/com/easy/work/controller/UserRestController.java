@@ -6,6 +6,10 @@ import com.easy.work.common.exception.EasyWorkException;
 import com.easy.work.model.User;
 import com.easy.work.util.vo.ResultVO;
 import com.easy.work.util.vo.ResultVOUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +19,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/user")
+@Api(value = "用户信息控制器")
 public class UserRestController extends BaseController {
 
     @Autowired
@@ -27,6 +32,8 @@ public class UserRestController extends BaseController {
      * @author Created by wuzhangwei on 2019/1/9
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @ApiOperation(value="根据用户编号获取用户信息", notes="test: 仅1和2有正确返回")
+    @ApiImplicitParam(paramType="query", name = "id", value = "用户编号", required = true, dataType = "int")
     public ResultVO findUserById(@PathVariable int id) {
         log.info("***************************findUserById****************************");
         User user = userService.findById(id);
@@ -40,6 +47,8 @@ public class UserRestController extends BaseController {
      * @author Created by wuzhangwei on 2019/1/9
      */
     @RequestMapping(value = "/findUserByName", method = RequestMethod.GET)
+    @ApiOperation(value="根据用户名获取用户信息", notes="test: 仅wzw正确返回")
+    @ApiImplicitParam(paramType = "query" , name = "userName" , value = "用户名" , required = true,dataType = "String")
     public ResultVO findOneUser(@RequestParam(value = "userName", required = true) String userName) {
         log.info("***************************findOneUser****************************");
         User user = userService.findUserByName(userName);
@@ -53,6 +62,7 @@ public class UserRestController extends BaseController {
      * @author Created by wuzhangwei on 2019/1/9
      */
     @RequestMapping(value = "/findAll", method = RequestMethod.GET)
+    @ApiOperation(value="获取用户列表", notes="目前一次全部取，不分页")
     public ResultVO findAll() {
         log.info("***************************findAll****************************");
         List<User> userList = userService.findAll();
@@ -66,6 +76,7 @@ public class UserRestController extends BaseController {
      * @author Created by wuzhangwei on 2019/1/9
      */
     @RequestMapping(value="/findUserList", method = RequestMethod.GET)
+    @ApiOperation(value="获取用户列表", notes="目前一次全部取，不分页")
     public ResultVO findUserList(@RequestBody Map<String, String> map) {
         log.info("*********findUserList**********************"+map.toString());
         List<User> listUser = userService.list(map);
@@ -73,6 +84,7 @@ public class UserRestController extends BaseController {
     }
 
     @RequestMapping(value="/save",method = RequestMethod.POST)
+    @ApiOperation(value="添加用户信息", notes="")
     public ResultVO save(@RequestBody User user) {
         log.info("save入参 "+user.toString());
         ResultVO resultVO = new ResultVO();
@@ -89,6 +101,11 @@ public class UserRestController extends BaseController {
     }
 
     @RequestMapping(value="/{id}",method=RequestMethod.PUT)
+    @ApiOperation(value="修改用户信息", notes="根据用户id修改用户信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType="query", name = "id", value = "用户ID", required = true, dataType = "int"),
+            @ApiImplicitParam( name = "user", value = "用户", required = true, dataType = "User")
+    })
     public ResultVO update(@PathVariable int id,@RequestBody User user) {
         log.info("update入参： "+user.toString());
         ResultVO resultVO = new ResultVO();
@@ -118,6 +135,8 @@ public class UserRestController extends BaseController {
      * @author Created by wuzhangwei on 2019/1/9
      */
     @RequestMapping(value="/{id}" ,method=RequestMethod.DELETE)
+    @ApiOperation(value="删除用户信息", notes="")
+    @ApiImplicitParam(paramType="query", name = "id", value = "用户ID", required = true, dataType = "int")
     public ResultVO delete(@PathVariable int id) {
         ResultVO resultVO = new ResultVO();
         try {

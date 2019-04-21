@@ -2,6 +2,7 @@ package com.easy.work.controller;
 
 import lombok.Data;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
 
 /**
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Controller;
  * @author Created by wuzhangwei on 2019/1/9
  */
 @Data
-@Controller
+@RestController
 public abstract class BaseController {
 
 	protected Integer page;//表第几页

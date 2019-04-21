@@ -18,7 +18,7 @@
 	<parameterMap id="User" type="com.easy.work.model.User"/>
 
 	<sql id="Base_Column_List">
-		id, user_name, password, true_name, sex, age, tel, wx,last_login_time,status,salt
+		id, user_name, password, true_name, sex, age, tel, wx,last_login_time,status
 	</sql>
 
 	<select id="findByName" resultMap="BaseResultMap" parameterType="java.lang.String">
