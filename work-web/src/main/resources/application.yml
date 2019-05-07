@@ -1,0 +1,46 @@
+server:
+  port: 8070
+  servlet:
+    context-path: /work
+application:
+  name: work
+
+spring:
+  profiles:
+    active: prod
+
+easywork:
+  name: easy-work
+
+druid:
+  url: jdbc:mysql://localhost:3306/springboot?useUnicode:true&characterEncoding:utf8
+  driver-class: com.mysql.jdbc.Driver
+  username: work
+  password: 123456
+  initial-size: 1
+  min-idle: 1
+  max-active: 20
+  test-on-borrow: true
+  timeBetweenEvictionRunsMillis: 9000
+
+## Mybatis 配置
+mybatis:
+  typeAliasesPackage: com.easy.work.model
+  mapperLocations: classpath:mapper/*.xml
+
+
+thymeleaf:
+  ## 是否启用模板缓存。
+  cache: true
+  ## 是否检查模板位置是否存在。
+  check-template: true
+  ## 是否为Web框架启用Thymeleaf视图分辨率。
+  enabled: true
+  ## 编码格式, 默认UTF-8
+  encoding: UTF-8
+  ## 应用于模板的模板模式。另请参阅Thymeleaf的TemplateMode枚举。
+  mode: HTML
+  ## 后缀 默认 .html
+  suffix: .html
+  ## 模板文件存放位置  , 默认 classpath:/templates/
+  prefix: classpath:/templates/

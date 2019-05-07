@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,15 @@ public class UserRestController extends BaseController {
 
     @Autowired
     private UserService userService;
+
+    @Value("${easywork.name}")
+    private String applicationName;
+
+    @RequestMapping(value = "/hello")
+    public String hello(){
+        System.out.println("easywork.name:"+applicationName);
+        return "hello:" + applicationName;
+    }
 
     /**
      * @Description: 通过id查找用户
