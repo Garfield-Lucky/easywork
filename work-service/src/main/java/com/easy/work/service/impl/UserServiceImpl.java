@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
      * @author Created by wuzhangwei on 2019/1/9
      */
     @Override
-    public Integer save(User user) throws Exception{
+    public Long save(User user) throws Exception{
         logger.info("saveUser"+user.toString());
        return userDao.save(user);
     }
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
      * @author Created by wuzhangwei on 2019/1/9
      */
     @Override
-    public User findById(Integer id) {
+    public User findById(Long id) {
         logger.info("findUserById"+id);
         return userDao.findById(id);
     }
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
      * @author Created by wuzhangwei on 2019/1/9
      */
     @Override
-    public Integer update(User user) throws Exception {
+    public Long update(User user) throws Exception {
         logger.info("updateByPrimaryKey"+user.toString());
         return userDao.update(user);
     }
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
      * @author Created by wuzhangwei on 2019/1/9
      */
     @Override
-    public Integer delete(Integer id) throws Exception{
+    public Long delete(Long id) throws Exception{
         logger.info("deleteByPrimaryKey"+id);
         return userDao.delete(id);
     }

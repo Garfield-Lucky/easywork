@@ -9,6 +9,7 @@ public enum ResultEnum {
     ERROR(-1, "error"),
     PARAMS_ERROR(101, "参数不正确"),
     USER_NOT_EXIST(102, "用户不存在"),
+    TOKEN_NOT_EXIST(103, "token不存在"),
     ;
 
     private Integer code;

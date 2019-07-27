@@ -44,7 +44,7 @@ public class UserRestController extends BaseController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ApiOperation(value="根据用户编号获取用户信息", notes="test: 仅1和2有正确返回")
     @ApiImplicitParam(paramType="query", name = "id", value = "用户编号", required = true, dataType = "int")
-    public ResultVO findUserById(@PathVariable int id) {
+    public ResultVO findUserById(@PathVariable Long id) {
         log.info("***************************findUserById****************************");
         User user = userService.findById(id);
         return ResultVOUtils.success(user);
@@ -99,7 +99,7 @@ public class UserRestController extends BaseController {
         log.info("save入参 "+user.toString());
         ResultVO resultVO = new ResultVO();
         try {
-            int a= userService.save(user);
+            long a= userService.save(user);
             resultVO.setCode(ResultEnum.SUCCESS.getCode());
             resultVO.setMsg("保存成功");
         } catch (Exception e) {
@@ -116,12 +116,12 @@ public class UserRestController extends BaseController {
             @ApiImplicitParam(paramType="query", name = "id", value = "用户ID", required = true, dataType = "int"),
             @ApiImplicitParam( name = "user", value = "用户", required = true, dataType = "User")
     })
-    public ResultVO update(@PathVariable int id,@RequestBody User user) {
+    public ResultVO update(@PathVariable Long id,@RequestBody User user) {
         log.info("update入参： "+user.toString());
         ResultVO resultVO = new ResultVO();
         try {
             user.setId(id);
-            int a = userService.update(user);
+            long a = userService.update(user);
             if(a == 0){
                 throw new EasyWorkException(ResultEnum.USER_NOT_EXIST);
             }
@@ -147,10 +147,10 @@ public class UserRestController extends BaseController {
     @RequestMapping(value="/{id}" ,method=RequestMethod.DELETE)
     @ApiOperation(value="删除用户信息", notes="")
     @ApiImplicitParam(paramType="query", name = "id", value = "用户ID", required = true, dataType = "int")
-    public ResultVO delete(@PathVariable int id) {
+    public ResultVO delete(@PathVariable Long id) {
         ResultVO resultVO = new ResultVO();
         try {
-            int a =userService.delete(id);
+            long a =userService.delete(id);
             if(a == 0){
                 throw new EasyWorkException(ResultEnum.USER_NOT_EXIST);
             }

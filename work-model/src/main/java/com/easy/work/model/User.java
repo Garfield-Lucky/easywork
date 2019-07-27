@@ -15,7 +15,7 @@ import java.util.Date;
  */
 
 @Data
-@ApiModel(value="医生对象模型")
+@ApiModel(value="用户对象模型")
 public class User implements Serializable {
 
 
@@ -23,7 +23,7 @@ public class User implements Serializable {
      * 用户id
      */
     @ApiModelProperty(value="id" ,required=true)
-    private Integer id;
+    private Long id;
 
     /**
      * 用户名

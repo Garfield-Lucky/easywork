@@ -17,7 +17,7 @@ import java.util.Set;
  * @author Create by wuzhangwei on 2019/1/9
  */
 @Repository
-public interface UserDao extends BaseDao<User,Integer> {
+public interface UserDao extends BaseDao<User,Long> {
 
    /**
     * @Description: 根据用户名称，查询用户信息
