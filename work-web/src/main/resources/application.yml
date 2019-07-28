@@ -7,7 +7,7 @@ application:
 
 spring:
   profiles:
-    active: prod
+    active: dev
 
 easywork:
   name: easy-work
@@ -44,3 +44,11 @@ thymeleaf:
   suffix: .html
   ## 模板文件存放位置  , 默认 classpath:/templates/
   prefix: classpath:/templates/
+
+  config:
+    #jwt配置信息
+    jwt:
+      #生成token的密钥
+      secret: b68a1c36fbde4d42bbeabd29b70db88e
+      #token过期时间 单位毫秒
+      expire-time: 3600000
