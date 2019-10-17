@@ -16,6 +16,11 @@ public class EasyWorkException extends RuntimeException {
         this.code = code;
     }
 
+    public EasyWorkException(Integer code, String message, Throwable cause) {
+        super(message, cause);
+        this.code = code;
+    }
+
     public Integer getCode() {
         return code;
     }
