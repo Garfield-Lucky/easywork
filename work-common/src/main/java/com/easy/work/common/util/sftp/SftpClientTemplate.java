@@ -1,4 +1,4 @@
-package com.easy.work.common.util;
+package com.easy.work.common.util.sftp;
 
 import com.easy.work.common.enums.ResultEnum;
 import com.easy.work.common.exception.EasyWorkException;
@@ -10,9 +10,11 @@ import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.dom4j.Document;
 import org.dom4j.io.SAXReader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -25,68 +27,11 @@ import java.util.Vector;
  * @author wuzhangwei
  */
 @Slf4j
+@Component
 public class SftpClientTemplate {
 
-    private GenericObjectPool<Session> sftpClientPool;
-
-    private int connectTimeout = 120;
-
-    public SftpClientTemplate(SftpClientFactory sftpClientFactory) {
-        this.sftpClientPool = new GenericObjectPool<>(sftpClientFactory);
-    }
-
-    public SftpClientTemplate(SftpClientFactory sftpClientFactory, GenericObjectPoolConfig poolConfig) {
-        this.sftpClientPool = new GenericObjectPool<>(sftpClientFactory, poolConfig);
-    }
-
-    private static class InnerHolder {
-        static final SftpClientProperties config= new SftpClientProperties();
-        static final GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
-
-
-        static {
-            config.setHost("192.168.182.129");
-            config.setUsername("wuzhangwei");
-            config.setPassword("123456");
-            config.setPort(2222);
-            config.setConnectTimeout(10000);
-            config.setDataTimeout(10000);
-
-            poolConfig.setTestOnBorrow(true);
-            poolConfig.setTestOnReturn(true);
-            poolConfig.setTestOnCreate(true);
-            poolConfig.setMaxWaitMillis(30000);
-            poolConfig.setMaxTotal(3);
-        }
-
-        static final SftpClientFactory factory = new SftpClientFactory(config);
-
-        private static final SftpClientTemplate INSTABCE = new SftpClientTemplate(factory, poolConfig);
-    }
-
-    private static class InnerHolder2 {
-        static final SftpClientProperties config2= new SftpClientProperties();
-
-        static {
-            config2.setHost("192.168.107.134");
-            config2.setUsername("wuzhangwei");
-            config2.setPassword("123456");
-            config2.setPort(2223);
-            config2.setConnectTimeout(100);
-            config2.setDataTimeout(30000);
-        }
-
-        static final SftpClientFactory factory2 = new SftpClientFactory(config2);
-        private static final SftpClientTemplate INSTABCE = new SftpClientTemplate(factory2);
-    }
-
-    public static SftpClientTemplate getInstance() {
-        return SftpClientTemplate.InnerHolder.INSTABCE;
-    }
-    public static SftpClientTemplate getInstance2() {
-        return SftpClientTemplate.InnerHolder2.INSTABCE;
-    }
-
+    @Autowired
+    SftpPool sftpPool;
 
     /**
      * @Description: 上传文件
@@ -97,22 +42,19 @@ public class SftpClientTemplate {
      * @return void
      * @author Created by wuzhangwei on 2019年9月24日
      */
-    public void upload(String savePath, String sftpFileName, InputStream input) throws SftpException {
-
+    public void upload(String savePath, String sftpFileName, InputStream input) {
         try {
             //从连接池取连接对象
-            final Session session = sftpClientPool.borrowObject();
+            final Session session = sftpPool.borrowObject();
             try {
                 ChannelSftp channelSftp = (ChannelSftp) session.openChannel("sftp");
-                channelSftp.connect(connectTimeout);
+                channelSftp.connect(3000);
 
                 System.out.println("session:" + session);
                 if (!checkPathExist(channelSftp, savePath)) {
                     createDir(channelSftp, savePath); //创建目录
                 }
-
                 channelSftp.put(input, sftpFileName);  //上传文件
-
                 log.info("upload file to sftp : success! fileName:{} ", sftpFileName);
             }
             catch (Exception e) {
@@ -122,13 +64,14 @@ public class SftpClientTemplate {
             finally {
                 if(session != null)
                     // 放回连接池
-                    sftpClientPool.returnObject(session);
+                    sftpPool.returnObject(session);
             }
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new EasyWorkException(ResultEnum.ERROR.getCode(), e.getMessage(), e);
         }
     }
+
     //检查是目录是否存在
     private boolean checkPathExist(ChannelSftp sftp, String savePath) {
         try {
@@ -170,10 +113,10 @@ public class SftpClientTemplate {
 
         try {
             //从连接池取连接对象
-            final Session session = sftpClientPool.borrowObject();
+            final Session session = sftpPool.borrowObject();
             try {
                 ChannelSftp channelSftp = (ChannelSftp) session.openChannel("sftp");
-                channelSftp.connect(connectTimeout);
+                channelSftp.connect(3000);
 
                 channelSftp.cd(remoteFilePath);
                 File file = new File(saveFile);
@@ -185,7 +128,7 @@ public class SftpClientTemplate {
             }
             finally {
                 // 放回连接池
-                sftpClientPool.returnObject(session);
+                sftpPool.returnObject(session);
             }
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -205,10 +148,10 @@ public class SftpClientTemplate {
 
         try {
             //从连接池取连接对象
-            final Session session = sftpClientPool.borrowObject();
+            final Session session = sftpPool.borrowObject();
             try {
                 ChannelSftp channelSftp = (ChannelSftp) session.openChannel("sftp");
-                channelSftp.connect(connectTimeout);
+                channelSftp.connect(3000);
 
                 channelSftp.cd(remoteFilePath);
                 InputStream is = channelSftp.get(remoteFileName);
@@ -223,7 +166,7 @@ public class SftpClientTemplate {
             }
             finally {
                 // 放回连接池
-                sftpClientPool.returnObject(session);
+                sftpPool.returnObject(session);
             }
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -243,10 +186,10 @@ public class SftpClientTemplate {
 
         try {
             //从连接池取连接对象
-            final Session session = sftpClientPool.borrowObject();
+            final Session session = sftpPool.borrowObject();
             try {
                 ChannelSftp channelSftp = (ChannelSftp) session.openChannel("sftp");
-                channelSftp.connect(connectTimeout);
+                channelSftp.connect(3000);
 
                 channelSftp.cd(remoteFilePath);
                 return channelSftp.get(remoteFileName);
@@ -257,7 +200,7 @@ public class SftpClientTemplate {
             }
             finally {
                 // 放回连接池
-                sftpClientPool.returnObject(session);
+                sftpPool.returnObject(session);
             }
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -276,10 +219,10 @@ public class SftpClientTemplate {
     public void delete(String remoteFilePath, String remoteFileName) {
         try {
             //从连接池取连接对象
-            final Session session = sftpClientPool.borrowObject();
+            final Session session = sftpPool.borrowObject();
             try {
                 ChannelSftp channelSftp = (ChannelSftp) session.openChannel("sftp");
-                channelSftp.connect(connectTimeout);
+                channelSftp.connect(3000);
 
                 channelSftp.cd(remoteFilePath);
                 channelSftp.rm(remoteFileName);
@@ -290,7 +233,7 @@ public class SftpClientTemplate {
             }
             finally {
                 // 放回连接池
-                sftpClientPool.returnObject(session);
+                sftpPool.returnObject(session);
             }
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -309,10 +252,10 @@ public class SftpClientTemplate {
     public List<String> getFileList(String filePath) {
         try {
             //从连接池取连接对象
-            final Session session = sftpClientPool.borrowObject();
+            final Session session = sftpPool.borrowObject();
             try {
                 ChannelSftp channelSftp = (ChannelSftp) session.openChannel("sftp");
-                channelSftp.connect(connectTimeout);
+                channelSftp.connect(3000);
 
                 @SuppressWarnings("unchecked")
                 Vector<ChannelSftp.LsEntry> v = channelSftp.ls(filePath);
@@ -332,7 +275,7 @@ public class SftpClientTemplate {
             }
             finally {
                 // 放回连接池
-                sftpClientPool.returnObject(session);
+                sftpPool.returnObject(session);
             }
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -352,10 +295,10 @@ public class SftpClientTemplate {
     public void remameFile(String remoteFilePath, String newRemoteFilePath, String fileName) {
         try {
             //从连接池取连接对象
-            final Session session = sftpClientPool.borrowObject();
+            final Session session = sftpPool.borrowObject();
             try {
                 ChannelSftp channelSftp = (ChannelSftp) session.openChannel("sftp");
-                channelSftp.connect(connectTimeout);
+                channelSftp.connect(3000);
                 if (!checkPathExist(channelSftp, newRemoteFilePath)) {
                     createDir(channelSftp, newRemoteFilePath); //创建目录
                 }
@@ -368,59 +311,12 @@ public class SftpClientTemplate {
             }
             finally {
                 // 放回连接池
-                sftpClientPool.returnObject(session);
+                sftpPool.returnObject(session);
             }
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new EasyWorkException(ResultEnum.ERROR.getCode(), e.getMessage(), e);
         }
     }
-
-
-
-    public static void main(String[] args ) {
-
-        try {
-
-            File file = new File("D:\\software\\uim卡\\C91_27_9390_1806056001.xml");
-            InputStream is = new FileInputStream(file);
-            SftpClientTemplate sftp = SftpClientTemplate.getInstance();
-            //测试文件上传
-            //sftp2.upload("/1002/test2/test7/", "C91_27_9390_1806056001.xml", is);
-
-            //Thread.sleep(20000);
-            //sftp2.upload("/1002/test2/test7/", "C91_27_9390_1806056002.xml", is);
-            System.out.println(sftp);
-            //Thread.sleep(20000);
-            //sftp2.upload("/1002/test2/test7/", "C91_27_9390_1806056003.xml", is);
-            //sftp2.upload("/1002/test2/test7/", "C91_27_9390_1806056003.xml", is);
-            //sftp2.upload("/1002/test2/test7/", "C91_27_9390_1806056003.xml", is);
-            //sftp2.upload("/1002/test2/test7/", "C91_27_9390_1806056003.xml", is);
-            //sftp2.upload("/1002/test2/test7/", "C91_27_9390_1806056003.xml", is);
-            sftp.upload("/1001/test2/test7/", "C91_27_9390_1806056003880.xml", is);
-            sftp.upload("/1001/test2/test7/", "C91_27_9390_1806056003881.xml", is);
-            sftp.upload("/1001/test2/test7/", "C91_27_9390_1806056003882.xml", is);
-            sftp.upload("/1001/test2/test7/", "C91_27_9390_1806056003883.xml", is);
-            sftp.upload("/1001/test2/test7/", "C91_27_9390_1806056003884.xml", is);
-            sftp.upload("/1001/test2/test7/", "C91_27_9390_1806056003885.xml", is);
-            sftp.upload("/1001/test2/test7/", "C91_27_9390_1806056003886.xml", is);
-            sftp.upload("/1001/test2/test7/", "C91_27_9390_1806056003887.xml", is);
-            sftp.upload("/1001/test2/test7/", "C91_27_9390_1806056003888.xml", is);
-
-
-            //sftp2.upload("/1002/test2/test7/", "C91_27_9390_1806056003.xml", is);
-            //sftp2.upload("/1002/test2/test7/", "C91_27_9390_1806056003.xml", is);
-            sftp.upload("/1001/test2/test7/", "C91_27_9390_180605600388.xml", is);
-
-            System.out.println(sftp);
-
-
-        }
-        catch (Exception e) {
-
-            e.printStackTrace();
-        }
-    }
-
 
 }

@@ -1,4 +1,4 @@
-package com.easy.work.common.util;
+package com.easy.work.common.util.sftp;
 
 import com.easy.work.common.enums.ResultEnum;
 import com.easy.work.common.exception.EasyWorkException;
@@ -10,7 +10,10 @@ import org.apache.commons.pool2.PooledObject;
 import org.apache.commons.pool2.impl.DefaultPooledObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Properties;
 
 
@@ -18,15 +21,13 @@ import java.util.Properties;
  * SFTPClient工厂类，通过SFTPClient工厂提供SFTPClient实例的创建和销毁
  * @author heaven
  */
+@Component
 public class SftpClientFactory extends BasePooledObjectFactory<Session> {
 
-    private static Logger log = LoggerFactory.getLogger("SftpClientFactory11");
+    private static Logger log = LoggerFactory.getLogger("SftpClientFactory");
 
+    @Autowired
     private SftpClientProperties sftpConfig;
-
-    public SftpClientFactory(SftpClientProperties config) {
-        this.sftpConfig = config;
-    }
 
     /**
      * 创建FtpClient对象
@@ -74,6 +75,8 @@ public class SftpClientFactory extends BasePooledObjectFactory<Session> {
     @Override
     public void destroyObject(PooledObject<Session> sftpPooled) {
 
+        System.out.println("destroyObject:" + new Date());
+
         if (sftpPooled == null) {
             return;
         }
@@ -98,6 +101,8 @@ public class SftpClientFactory extends BasePooledObjectFactory<Session> {
     public boolean validateObject(PooledObject<Session> arg0) {
 
         try {
+            System.out.println("validateObject:" + new Date());
+
             Session session = arg0.getObject();
             if(session.isConnected()) {
                 return super.validateObject(arg0);

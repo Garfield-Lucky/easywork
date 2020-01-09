@@ -1,9 +1,13 @@
-package com.easy.work.common.util;
+package com.easy.work.common.util.sftp;
 
 import lombok.Data;
 import org.apache.commons.net.ftp.FTP;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 @Data
+@Component
+@ConfigurationProperties(prefix = "sftp-pool")
 public class SftpClientProperties {
     /**
      * ftp地址
@@ -24,7 +28,6 @@ public class SftpClientProperties {
      * 登录密码
      */
     private String password;
-
 
     /**
      * 连接超时时间(秒)
