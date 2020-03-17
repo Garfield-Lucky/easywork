@@ -3,9 +3,11 @@ package com.easy.work.controller;
 import com.easy.work.api.service.UserService;
 import com.easy.work.common.enums.ResultEnum;
 import com.easy.work.common.exception.EasyWorkException;
+import com.easy.work.common.util.sftp.SftpClientTemplate;
 import com.easy.work.model.User;
 import com.easy.work.util.vo.ResultVO;
 import com.easy.work.util.vo.ResultVOUtils;
+import com.jcraft.jsch.SftpException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -14,12 +16,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.*;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 @Api(value = "用户信息控制器")
 public class UserRestController extends BaseController {
 
@@ -28,6 +32,13 @@ public class UserRestController extends BaseController {
 
     @Value("${easywork.name}")
     private String applicationName;
+
+    //@Autowired
+    //SftpPoolConfig sftpPoolConfig;
+
+    @Autowired
+    SftpClientTemplate sftpClientTemplate;
+
 
     @RequestMapping(value = "/hello")
     public String hello(){
@@ -43,7 +54,7 @@ public class UserRestController extends BaseController {
      */
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ApiOperation(value="根据用户编号获取用户信息", notes="test: 仅1和2有正确返回")
-    @ApiImplicitParam(paramType="query", name = "id", value = "用户编号", required = true, dataType = "int")
+    @ApiImplicitParam(paramType="path", name = "id", value = "用户编号", required = true, dataType = "long")
     public ResultVO findUserById(@PathVariable Long id) {
         log.info("***************************findUserById****************************");
         User user = userService.findById(id);
@@ -71,11 +82,64 @@ public class UserRestController extends BaseController {
      * @param
      * @author Created by wuzhangwei on 2019/1/9
      */
-    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     @ApiOperation(value="获取用户列表", notes="目前一次全部取，不分页")
-    public ResultVO findAll() {
+    public ResultVO findAll() throws FileNotFoundException, SftpException, InterruptedException {
         log.info("***************************findAll****************************");
         List<User> userList = userService.findAll();
+
+        //System.out.println(sftpPoolConfig.toString());
+        //File file = new File("D:\\software\\uim卡\\C91_27_9390_1806056001.xml");
+        //InputStream is = new FileInputStream(file);
+        //SftpClientTemplate sftp = SftpClientTemplate.getInstance();
+
+        //new Thread(()->{
+        //    try{
+        //        //测试文件上传
+        //        sftpClientTemplate.upload("/1001/test2/test7/", "C91_27_9390_1806056001.xml", is);
+        //        System.out.println("1:"+sftpClientTemplate);
+        //        //sftpClientTemplate.upload2("/1001/test2/test7/", "C91_27_9390_1806056002.xml", is);
+        //        //System.out.println("2:"+sftpClientTemplate);
+        //        //sftp.upload("/1001/test2/test7/", "C91_27_9390_1806056003.xml", is);
+        //        //System.out.println("3:"+sftp);
+        //
+        //    }catch (Exception e){
+        //        e.printStackTrace();
+        //    }finally{
+        //        try {
+        //            is.close();
+        //        } catch (IOException e) {
+        //            e.printStackTrace();
+        //        }
+        //    }
+        //}
+        //).start();
+        //
+        //new Thread(()->{
+        //    try{
+        //        //Thread.sleep(20000);
+        //        sftpClientTemplate.upload("/1001/test2/test7/", "C91_27_9390_1806056002.xml", is);
+        //        System.out.println("2:"+sftpClientTemplate);
+        //
+        //    }catch (Exception e){
+        //        e.printStackTrace();
+        //    }
+        //}
+        //).start();
+        //
+        //new Thread(()->{
+        //    try{
+        //
+        //        //Thread.sleep(20000);
+        //        sftpClientTemplate.upload("/1001/test2/test7/", "C91_27_9390_1806056003.xml", is);
+        //        System.out.println("3:"+sftpClientTemplate);
+        //    }catch (Exception e){
+        //        e.printStackTrace();
+        //    }
+        //}
+        //).start();
+
+
         return ResultVOUtils.success(userList);
     }
 
@@ -93,7 +157,7 @@ public class UserRestController extends BaseController {
         return ResultVOUtils.success(listUser);
     }
 
-    @RequestMapping(value="/save",method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     @ApiOperation(value="添加用户信息", notes="")
     public ResultVO save(@RequestBody User user) {
         log.info("save入参 "+user.toString());
@@ -113,7 +177,7 @@ public class UserRestController extends BaseController {
     @RequestMapping(value="/{id}",method=RequestMethod.PUT)
     @ApiOperation(value="修改用户信息", notes="根据用户id修改用户信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType="query", name = "id", value = "用户ID", required = true, dataType = "int"),
+            @ApiImplicitParam(paramType="path", name = "id", value = "用户ID", required = true, dataType = "long"),
             @ApiImplicitParam( name = "user", value = "用户", required = true, dataType = "User")
     })
     public ResultVO update(@PathVariable Long id,@RequestBody User user) {
@@ -146,7 +210,7 @@ public class UserRestController extends BaseController {
      */
     @RequestMapping(value="/{id}" ,method=RequestMethod.DELETE)
     @ApiOperation(value="删除用户信息", notes="")
-    @ApiImplicitParam(paramType="query", name = "id", value = "用户ID", required = true, dataType = "int")
+    @ApiImplicitParam(paramType="path", name = "id", value = "用户ID", required = true, dataType = "long")
     public ResultVO delete(@PathVariable Long id) {
         ResultVO resultVO = new ResultVO();
         try {

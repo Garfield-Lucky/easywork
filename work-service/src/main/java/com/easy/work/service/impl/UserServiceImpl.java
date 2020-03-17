@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -78,11 +79,14 @@ public class UserServiceImpl implements UserService {
      * @param
      * @author Created by wuzhangwei on 2019/1/9
      */
+    //@Transactional(timeout=5)
     @Override
     public Long update(User user) throws Exception {
         logger.info("updateByPrimaryKey"+user.toString());
-        return userDao.update(user);
+        long flag = userDao.update(user);
+        return flag;
     }
+
 
     /**
      * @Description: 获取角色

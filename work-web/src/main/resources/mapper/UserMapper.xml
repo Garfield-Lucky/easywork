@@ -81,8 +81,8 @@
 		where id = #{id,jdbcType=INTEGER}
 	</update>
 
-	<select id="findAll" resultType="com.easy.work.model.User">
-        select * from sys_user
+	<select id="findAll" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" />  from sys_user
     </select>
 
     <delete id="delete" parameterType="java.lang.Integer">
