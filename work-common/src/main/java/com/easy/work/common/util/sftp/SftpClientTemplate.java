@@ -42,11 +42,12 @@ public class SftpClientTemplate {
      * @return void
      * @author Created by wuzhangwei on 2019年9月24日
      */
-    public void upload(String savePath, String sftpFileName, InputStream input) {
-        try {
+    public void upload(String savePath, String sftpFileName, InputStream input) throws Exception {
+
             //从连接池取连接对象
-            final Session session = sftpPool.borrowObject();
+             Session session = null;
             try {
+                session = sftpPool.borrowObject();
                 ChannelSftp channelSftp = (ChannelSftp) session.openChannel("sftp");
                 channelSftp.connect(3000);
 
@@ -62,14 +63,13 @@ public class SftpClientTemplate {
                 throw new EasyWorkException(ResultEnum.ERROR.getCode(), e.getMessage(), e);
             }
             finally {
-                if(session != null)
+                if(session != null) {
                     // 放回连接池
                     sftpPool.returnObject(session);
+                } else {
+                    System.out.println("session is null");
+                }
             }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new EasyWorkException(ResultEnum.ERROR.getCode(), e.getMessage(), e);
-        }
     }
 
     //检查是目录是否存在
@@ -109,9 +109,8 @@ public class SftpClientTemplate {
      * @param saveFile  保存下载文件的路径
      * @param saveFile 存在本地的路径
      */
-    public void download(String remoteFilePath, String remoteFileName, String saveFile) {
+    public void download(String remoteFilePath, String remoteFileName, String saveFile) throws Exception {
 
-        try {
             //从连接池取连接对象
             final Session session = sftpPool.borrowObject();
             try {
@@ -130,10 +129,6 @@ public class SftpClientTemplate {
                 // 放回连接池
                 sftpPool.returnObject(session);
             }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new EasyWorkException(ResultEnum.ERROR.getCode(), e.getMessage(), e);
-        }
     }
 
 
@@ -144,9 +139,8 @@ public class SftpClientTemplate {
      * @return
      * @return Document
      */
-    public Document downloadXmlDocument(String remoteFilePath, String remoteFileName) {
+    public Document downloadXmlDocument(String remoteFilePath, String remoteFileName) throws Exception {
 
-        try {
             //从连接池取连接对象
             final Session session = sftpPool.borrowObject();
             try {
@@ -168,10 +162,6 @@ public class SftpClientTemplate {
                 // 放回连接池
                 sftpPool.returnObject(session);
             }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new EasyWorkException(ResultEnum.ERROR.getCode(), e.getMessage(), e);
-        }
 
     }
 
@@ -182,9 +172,8 @@ public class SftpClientTemplate {
      * @return
      * @return InputStream
      */
-    public InputStream downloadFile(String remoteFilePath, String remoteFileName) {
+    public InputStream downloadFile(String remoteFilePath, String remoteFileName) throws Exception {
 
-        try {
             //从连接池取连接对象
             final Session session = sftpPool.borrowObject();
             try {
@@ -202,10 +191,6 @@ public class SftpClientTemplate {
                 // 放回连接池
                 sftpPool.returnObject(session);
             }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new EasyWorkException(ResultEnum.ERROR.getCode(), e.getMessage(), e);
-        }
 
     }
 
@@ -216,8 +201,7 @@ public class SftpClientTemplate {
      * @param remoteFileName 要删除的文件名称
      * @return void
      */
-    public void delete(String remoteFilePath, String remoteFileName) {
-        try {
+    public void delete(String remoteFilePath, String remoteFileName) throws Exception {
             //从连接池取连接对象
             final Session session = sftpPool.borrowObject();
             try {
@@ -235,10 +219,6 @@ public class SftpClientTemplate {
                 // 放回连接池
                 sftpPool.returnObject(session);
             }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new EasyWorkException(ResultEnum.ERROR.getCode(), e.getMessage(), e);
-        }
     }
 
 
@@ -249,8 +229,7 @@ public class SftpClientTemplate {
      * @return
      * @return List<String>
      */
-    public List<String> getFileList(String filePath) {
-        try {
+    public List<String> getFileList(String filePath) throws Exception {
             //从连接池取连接对象
             final Session session = sftpPool.borrowObject();
             try {
@@ -277,10 +256,6 @@ public class SftpClientTemplate {
                 // 放回连接池
                 sftpPool.returnObject(session);
             }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new EasyWorkException(ResultEnum.ERROR.getCode(), e.getMessage(), e);
-        }
     }
 
 
@@ -292,8 +267,7 @@ public class SftpClientTemplate {
      * @throws EasyWorkException
      * @return void
      */
-    public void remameFile(String remoteFilePath, String newRemoteFilePath, String fileName) {
-        try {
+    public void remameFile(String remoteFilePath, String newRemoteFilePath, String fileName) throws Exception {
             //从连接池取连接对象
             final Session session = sftpPool.borrowObject();
             try {
@@ -313,10 +287,6 @@ public class SftpClientTemplate {
                 // 放回连接池
                 sftpPool.returnObject(session);
             }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new EasyWorkException(ResultEnum.ERROR.getCode(), e.getMessage(), e);
-        }
     }
 
 }
