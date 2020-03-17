@@ -102,7 +102,7 @@ sftp-pool:
     # 当对象池没有空闲对象时，新的获取对象的请求是否阻塞
     block-when-exhausted: true
     # 是否注册JMX
-    jmx-enabled: true
+    jmx-enabled: false
     # JMX前缀，当jmxEnabled为true时有效
     jmx-name-prefix: pool
     # 使用jmxNameBase + jmxNamePrefix + i来生成ObjectName，当jmxEnabled为true时有效
