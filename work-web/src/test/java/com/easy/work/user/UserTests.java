@@ -23,7 +23,7 @@ public class UserTests {
     public void saveUser() {
         User user = new User();
         user.setUserName("张三");
-        user.setTrueName("张三丰");
+        user.setTrueName("张三丰333");
         user.setAge(26);
         user.setPassword("123456");
         user.setSex("男");
