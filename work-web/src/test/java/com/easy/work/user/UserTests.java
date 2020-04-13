@@ -22,7 +22,7 @@ public class UserTests {
     @Test
     public void saveUser() {
         User user = new User();
-        user.setUserName("张三");
+        user.setUserName("张三222");
         user.setTrueName("张三丰");
         user.setAge(26);
         user.setPassword("123456");
