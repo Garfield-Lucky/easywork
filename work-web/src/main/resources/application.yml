@@ -8,6 +8,11 @@ application:
 spring:
   profiles:
     active: dev
+  redis:
+    host: 127.0.0.1
+    password: 123456789
+    port: 6379
+    database: 0
 
 easywork:
   name: easy-work
@@ -22,6 +27,7 @@ druid:
   max-active: 20
   test-on-borrow: true
   timeBetweenEvictionRunsMillis: 9000
+
 
 ## Mybatis 配置
 mybatis:
